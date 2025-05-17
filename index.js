@@ -45,7 +45,7 @@ const startWhatsAppClient = async () => {
                 browser: Browsers.macOS("Safari"),
             });
   
-  sock.ev.on('creds.update', saveState)
+  sock.ev.on('creds.update', saveCreds)
 
   sock.ev.on('connection.update', (update) => {
     const { connection, lastDisconnect } = update
