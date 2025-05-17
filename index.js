@@ -4,7 +4,7 @@ const {
   useSingleFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion
-} = require('@whiskeysockets/baileys')
+} = require('baileys')
 const qrcode = require('qrcode')
 const express = require('express')
 const multer = require('multer')
