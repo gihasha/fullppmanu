@@ -9,7 +9,7 @@
     "baileys": "npm:manul-ofc-baileys-new",
     "express": "^4.17.1",
     "multer": "^1.4.2",
-    "sharp": "^0.30.7",
+    "sharp": "^0.34.1",
     "cors": "^2.8.5",
     "body-parser": "^1.20.2"
   }
