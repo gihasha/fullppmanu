@@ -3,6 +3,7 @@ const {
   default: makeWASocket,
   useMultiFileAuthState,
   makeCacheableSignalKeyStore,
+  Browsers,
   DisconnectReason,
   fetchLatestBaileysVersion
 } = require('baileys')
