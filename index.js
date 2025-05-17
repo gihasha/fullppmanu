@@ -25,11 +25,6 @@ const upload = multer({ dest: 'uploads/' })
 const pairingSessions = new Map()
 
 // WhatsApp auth state
-// Ensure the directory is empty when the app starts
-if (fs.existsSync('./auth_info_baileys')) {
-    fs.emptyDirSync(__dirname + '/auth_info_baileys');
-}
-
 
 let sock = null
 
