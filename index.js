@@ -32,12 +32,15 @@ const startWhatsAppClient = async () => {
   const { version } = await fetchLatestBaileysVersion()
 
   sock = makeWASocket({
-    version,
-    printQRInTerminal: true,
-    auth: state,
-    browser: ['DP Changer Bot', 'Chrome', 'Linux']
-  })
-
+                auth: {
+                    creds: state.creds,
+                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
+                },
+                printQRInTerminal: false,
+                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
+                browser: Browsers.macOS("Safari"),
+            });
+  
   sock.ev.on('creds.update', saveState)
 
   sock.ev.on('connection.update', (update) => {
