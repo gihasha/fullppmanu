@@ -1,7 +1,7 @@
 const { Boom } = require('@hapi/boom')
 const {
   default: makeWASocket,
-  useSingleFileAuthState,
+  useMultiFileAuthState,
   DisconnectReason,
   fetchLatestBaileysVersion
 } = require('baileys')
@@ -25,7 +25,7 @@ const upload = multer({ dest: 'uploads/' })
 const pairingSessions = new Map()
 
 // WhatsApp auth state
-const { state, saveState } = useSingleFileAuthState('./auth_info.json')
+const { state, saveState } = useMultiFileAuthState('./auth_info.json')
 let sock = null
 
 const startWhatsAppClient = async () => {
