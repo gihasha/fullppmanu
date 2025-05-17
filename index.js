@@ -2,6 +2,7 @@ const { Boom } = require('@hapi/boom')
 const {
   default: makeWASocket,
   useMultiFileAuthState,
+  makeCacheableSignalKeyStore,
   DisconnectReason,
   fetchLatestBaileysVersion
 } = require('baileys')
