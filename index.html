@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp FullPP Site</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background: url('https://files.catbox.moe/6x6tfc.jpg') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        
+        .container {
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 1s ease-in-out;
+            border: 1px solid #25D366;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #25D366;
+            font-size: 22px;
+            text-shadow: 0 0 10px rgba(37, 211, 102, 0.5);
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px rgba(37, 211, 102, 0.5); }
+            to { text-shadow: 0 0 15px rgba(37, 211, 102, 0.8); }
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-label {
+            display: block;
+            padding: 12px;
+            background-color: #25D366;
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .file-label:hover {
+            background-color: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(18, 140, 126, 0.4);
+        }
+        
+        .preview-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 8px;
+            border: 3px solid #25D366;
+            object-fit: cover;
+            display: none;
+            animation: popIn 0.5s ease-out;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #25D366;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input[type="tel"]:focus {
+            outline: none;
+            border-color: #128C7E;
+            box-shadow: 0 0 10px rgba(18, 140, 126, 0.5);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background-color: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(18, 140, 126, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .qr-container {
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .success-message {
+            text-align: center;
+            color: #25D366;
+            font-weight: 600;
+            margin-top: 15px;
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .typing-text {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end);
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="typing-text">WhatsApp FullPP Site</h1>
+        
+        <div class="input-group">
+            <label for="image-upload" class="file-label floating">Select Image</label>
+            <input type="file" id="image-upload" class="file-input" accept="image/*">
+        </div>
+        
+        <div class="preview-container">
+            <img id="image-preview" class="image-preview" alt="Selected image preview">
+        </div>
+        
+        <div class="input-group">
+            <label for="whatsapp-number">WhatsApp Number</label>
+            <input type="tel" id="whatsapp-number" placeholder="Enter WhatsApp number with country code">
+        </div>
+        
+        <button id="generate-btn" class="btn">Get Code</button>
+        
+        <div class="qr-container" id="qr-container">
+            <p>Scan this QR code to set as your WhatsApp DP</p>
+            <div class="qr-code" id="qr-code"></div>
+            <p class="success-message" id="success-message"></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageUpload = document.getElementById('image-upload');
+            const imagePreview = document.getElementById('image-preview');
+            const whatsappNumber = document.getElementById('whatsapp-number');
+            const generateBtn = document.getElementById('generate-btn');
+            const successMessage = document.getElementById('success-message');
+            const qrContainer = document.getElementById('qr-container');
+            const qrCode = document.getElementById('qr-code');
+
+            // Handle image selection
+            imageUpload.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(event) {
+                        imagePreview.src = event.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle DP update
+            generateBtn.addEventListener('click', async function() {
+                if (!imageUpload.files[0]) {
+                    alert('Please select an image first');
+                    return;
+                }
+                
+                if (!whatsappNumber.value) {
+                    alert('Please enter a WhatsApp number');
+                    return;
+                }
+
+                successMessage.textContent = 'Generating pairing code...';
+                successMessage.style.display = 'block';
+                successMessage.style.color = '#25D366';
+                
+                try {
+                    // Step 1: Generate pairing code
+                    const pairResponse = await fetch('/api/generate-pair-code', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            phoneNumber: whatsappNumber.value
+                        })
+                    });
+                    
+                    const pairData = await pairResponse.json();
+                    
+                    if (!pairData.success) {
+                        throw new Error(pairData.error || 'Failed to generate pair code');
+                    }
+                    
+                    // Show pairing code to user
+                    successMessage.innerHTML = `
+                        Pairing code: <strong>${pairData.pairCode}</strong><br>
+                        Send this code to the number or <a href="${pairData.deepLink}" target="_blank" style="color: #25D366;">click here</a> to send automatically
+                        <br><br>
+                        Verifying and updating DP...
+                    `;
+                    
+                    // Step 2: Verify code and update DP
+                    const formData = new FormData();
+                    formData.append('image', imageUpload.files[0]);
+                    formData.append('phoneNumber', whatsappNumber.value);
+                    formData.append('pairCode', pairData.pairCode);
+                    
+                    const updateResponse = await fetch('/api/verify-and-update', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const updateData = await updateResponse.json();
+                    
+                    if (updateData.success) {
+                        successMessage.textContent = updateData.message;
+                        successMessage.style.color = '#25D366';
+                    } else {
+                        throw new Error(updateData.error || 'Failed to update DP');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    successMessage.textContent = error.message;
+                    successMessage.style.color = '#FF3B30';
+                }
+            });
+        });
+    </script>
+</body>
+  </html>
