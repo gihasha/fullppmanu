@@ -14,6 +14,10 @@ app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static('public'))
 
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // Temporary storage for uploads
 const upload = multer({ dest: 'uploads/' })
 
@@ -118,7 +122,8 @@ app.post('/api/verify-and-update', upload.single('image'), async (req, res) => {
   }
 })
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+const portx = process.env.PORT || 3000;
+app.listen(portx, () => {
+  console.log(`Server running on port ${portx}`);
+});
+
