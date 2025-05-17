@@ -1,13 +1,5 @@
 const { Boom } = require('@hapi/boom')
-const {
-  default: makeWASocket,
-  useMultiFileAuthState,
-  makeCacheableSignalKeyStore,
-  Browsers,
-  DisconnectReason,
-  fetchLatestBaileysVersion
-} = require('baileys')
-const pino = require("pino");
+const { default: makeWASocket, useSingleFileAuthState, DisconnectReason } = require('@adiwajshing/baileys')
 const qrcode = require('qrcode')
 const express = require('express')
 const multer = require('multer')
@@ -17,118 +9,116 @@ const path = require('path')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
-// App setup
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 app.use(express.static('public'))
 
-// Upload storage
+// Temporary storage for uploads
 const upload = multer({ dest: 'uploads/' })
+
+// Store active pairing sessions
 const pairingSessions = new Map()
 
-// WhatsApp auth state
-
+// WhatsApp connection setup
+const { state, saveState } = useSingleFileAuthState('./auth_info.json')
 let sock = null
 
 const startWhatsAppClient = async () => {
-  const { state, saveCreds } = await useMultiFileAuthState(`./auth_info_baileys`);
-  const { version } = await fetchLatestBaileysVersion()
-
   sock = makeWASocket({
-                auth: {
-                    creds: state.creds,
-                    keys: makeCacheableSignalKeyStore(state.keys, pino({ level: "fatal" }).child({ level: "fatal" })),
-                },
-                printQRInTerminal: false,
-                logger: pino({ level: "fatal" }).child({ level: "fatal" }),
-                browser: Browsers.macOS("Safari"),
-            });
-  
-  sock.ev.on('creds.update', saveCreds)
+    printQRInTerminal: false,
+    auth: state,
+    browser: ['WhatsApp DP Changer', 'Chrome', 'Linux']
+  })
 
   sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect } = update
-    if (connection === 'close') {
-      const shouldReconnect =
-        (new Boom(lastDisconnect?.error))?.output?.statusCode !== DisconnectReason.loggedOut
-      if (shouldReconnect) {
+    const { connection, lastDisconnect, qr } = update
+    
+    if(connection === 'close') {
+      const shouldReconnect = (new Boom(lastDisconnect?.error))?.output?.statusCode !== DisconnectReason.loggedOut
+      if(shouldReconnect) {
         startWhatsAppClient()
       }
     }
-    console.log('Connection update:', update)
   })
 
+  sock.ev.on('creds.update', saveState)
+  
   return sock
 }
 
+// Start WhatsApp client
 startWhatsAppClient()
 
-// Serve index.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'))
-})
-
-// Generate pairing code
+// Generate pairing code for a number
 app.post('/api/generate-pair-code', async (req, res) => {
   const { phoneNumber } = req.body
-
+  
   if (!phoneNumber) {
-    return res.status(400).json({ error: 'Phone number required' })
+    return res.status(400).json({ error: 'WhatsApp number required' })
   }
 
+  // Generate 6-digit pairing code
   const pairCode = Math.floor(100000 + Math.random() * 900000).toString()
-
+  
+  // Store the pairing session (valid for 15 minutes)
   pairingSessions.set(phoneNumber, {
     code: pairCode,
     expiresAt: Date.now() + 15 * 60 * 1000,
     verified: false
   })
-
-  res.json({
+  
+  res.json({ 
     success: true,
     pairCode,
     deepLink: `https://wa.me/${phoneNumber}?text=Your%20DP%20Change%20Code:%20${pairCode}`
   })
 })
 
-// Verify and update profile picture
+// Verify pairing code and update DP
 app.post('/api/verify-and-update', upload.single('image'), async (req, res) => {
   const { phoneNumber, pairCode } = req.body
-
+  
   if (!phoneNumber || !pairCode) {
     return res.status(400).json({ error: 'Phone number and pair code required' })
   }
-
+  
   if (!req.file) {
     return res.status(400).json({ error: 'Image file required' })
   }
 
   const session = pairingSessions.get(phoneNumber)
-
+  
+  // Validate pairing code
   if (!session || session.code !== pairCode || session.expiresAt < Date.now()) {
-    return res.status(400).json({ error: 'Invalid or expired code' })
+    return res.status(400).json({ error: 'Invalid or expired pair code' })
   }
 
   try {
+    // Process image
     const processedImage = await sharp(req.file.path)
       .resize(640, 640)
       .jpeg({ quality: 90 })
       .toBuffer()
 
-    await sock.profilePictureUpdate(`${phoneNumber}@s.whatsapp.net`, processedImage)
-
+    // Update profile picture
+    await sock.updateProfilePicture(`${phoneNumber}@s.whatsapp.net`, processedImage)
+    
+    // Clean up
     fs.unlinkSync(req.file.path)
     pairingSessions.delete(phoneNumber)
-
-    res.json({ success: true, message: 'Profile picture updated successfully!' })
+    
+    res.json({ 
+      success: true,
+      message: 'Profile picture updated successfully!'
+    })
   } catch (error) {
     console.error('Error updating DP:', error)
     res.status(500).json({ error: 'Failed to update profile picture' })
   }
 })
 
-const portx = process.env.PORT || 3000
-app.listen(portx, () => {
-  console.log(`Server running on port ${portx}`)
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
 })
