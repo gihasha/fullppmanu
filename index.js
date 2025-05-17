@@ -6,6 +6,7 @@ const {
   DisconnectReason,
   fetchLatestBaileysVersion
 } = require('baileys')
+const pino = require("pino");
 const qrcode = require('qrcode')
 const express = require('express')
 const multer = require('multer')
